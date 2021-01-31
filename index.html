@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" />
+        <link rel="stylesheet" href="style.css"/>
+    </head>
+    <body>
+        <img width="100%" height="100%" src="minecraft4k.jpg" style="position: absolute;"/>
+        <div id="form">
+            <label for="username">Nom d'utilisateur:</label><input class="ui input" type="text" name="username" id="user"/>
+            <br>
+            <label for="password">Mot de passe:</label><input class="ui input" type="password" name="password" id="password"/>
+            <br>
+            <label for="version">Version:</label><input class="ui input" type="text" name="version" id="version"/>
+            <br>
+            <label for="forge">Forge:</label>
+			<select name="forge" id="forge">
+				<option></option>
+			</select>
+            <input type="submit" id="submit" value="Valider" class="ui green button" style="width:50%;position: relative;left: 25%;"/>
+        </div>
+        <script>
+            const fs=require("fs");
+            fs.readdir("./ForgeVersions",(err,files)=>{
+                files.forEach(file => {
+                    let option= document.createElement("option");
+                    let filePath=document.createTextNode("./ForgeVersions/"+file);
+                    let select=document.getElementById("forge");
+                    select.appendChild(option);
+                    option.appendChild(filePath);
+                });
+            })
+            // include the ipc module to communicate with main process.
+            const ipcRenderer = require('electron').ipcRenderer; 
+			const settings=require("./settings.json");
+			if(settings["username"]){
+				document.getElementById("user").value=settings["username"];
+				if(settings["password"])
+					document.getElementById("password").value=settings["password"];
+			}
+            const btnclick = document.getElementById('submit');
+            btnclick.addEventListener('click', function () {
+            let args=[];
+            args[0]=document.getElementById("user").value;
+            args[1]=document.getElementById("password").value
+            args[2]=document.getElementById("version").value
+                ipcRenderer.send("btnclick",document.getElementById("user").value,document.getElementById("password").value,document.getElementById("version").value,document.getElementById("forge").value); // ipcRender.send will pass the information to main process
+            });
+            </script>
+    </body>
+</html>
